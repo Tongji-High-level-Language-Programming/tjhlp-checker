@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [ "master" ]
 
+permissions:
+  # Coverage Badge Update requires write permission to the repository contents
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
