@@ -1,6 +1,6 @@
 # TJHLP-CHECKER 同济高程代码合规检查
 
-[![Continuous Integration](https://github.com/Maoyao233/tjhlp-checker/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/Maoyao233/tjhlp-checker/actions/workflows/continuous-integration.yml)  [![cov](https://Maoyao233.github.io/tjhlp-checker/badges/coverage.svg)](https://github.com/Maoyao233/tjhlp-checker/actions)  [![PyPI - Version](https://img.shields.io/pypi/v/tjhlp-checker)](https://pypi.org/project/tjhlp-checker/)
+[![Continuous Integration](https://github.com/Tongji-High-level-Language-Programming/tjhlp-checker/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/Tongji-High-level-Language-Programming/tjhlp-checker/actions/workflows/continuous-integration.yml)  [![cov](https://Tongji-High-level-Language-Programming.github.io/tjhlp-checker/badges/coverage.svg)](https://github.com/Tongji-High-level-Language-Programming/tjhlp-checker/actions)  [![PyPI - Version](https://img.shields.io/pypi/v/tjhlp-checker)](https://pypi.org/project/tjhlp-checker/)
 
 ## 简介
 
@@ -51,7 +51,7 @@ tjhlp-checker --config-file=<PATH TO CONFIG FILE> <FILE>
 本项目使用 [uv](https://docs.astral.sh/uv/) 进行项目管理。
 
 ```bash
-git clone https://github.com/Maoyao233/tjhlp-checker && cd tjhlp-checker
+git clone https://github.com/Tongji-High-level-Language-Programming/tjhlp-checker && cd tjhlp-checker
 uv sync --all-extras --dev
 uvx pre-commit install
 uv build
