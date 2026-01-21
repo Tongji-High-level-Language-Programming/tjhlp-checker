@@ -5,7 +5,7 @@ description = "This project is a code inspection tool for teaching purposes in t
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "libclang>=18.1.1",
+    "clang>=21.1.7",
     "pydantic>=2.11.1",
 ]
 
