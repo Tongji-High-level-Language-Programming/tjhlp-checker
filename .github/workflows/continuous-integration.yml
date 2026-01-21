@@ -35,7 +35,7 @@ jobs:
       uses: KyleMayes/install-llvm-action@v2
       with:
         version: "21"
-        directory: ${{ env.HOME }}/llvm-21
+        directory:  ${{ runner.temp }}/llvm-21
     - name: Install uv
       uses: astral-sh/setup-uv@v7
       with:
