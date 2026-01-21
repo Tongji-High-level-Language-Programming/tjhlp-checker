@@ -22,7 +22,7 @@ jobs:
         python-version: ["3.13", "3.14"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Install 32-bit library
       uses: tecolicom/actions-use-apt-tools@v1
       with:
@@ -31,7 +31,7 @@ jobs:
         cache: yes
         path: /usr/lib /usr/share /usr/include
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
