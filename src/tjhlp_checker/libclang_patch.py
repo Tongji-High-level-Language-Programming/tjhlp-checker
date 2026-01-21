@@ -5,6 +5,7 @@ from clang.cindex import (
     cursor_null_guard,
 )
 
+
 class UnaryOperator(BaseEnumeration):
     """
     Describes the UnaryOperator of a declaration
