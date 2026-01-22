@@ -14,7 +14,24 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+        python-version: "3.14"
+    - name: Lint with ruff
+      run: |
+        uv tool run ruff check --output-format=github
+    - name: Format with ruff
+      run: |
+        uv tool run ruff format --diff
+
+  unit-test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -30,12 +47,6 @@ jobs:
         method: timestamp
         cache: yes
         path: /usr/lib /usr/share /usr/include
-    - name: Install LLVM and Clang
-      id: install-llvm
-      uses: KyleMayes/install-llvm-action@v2
-      with:
-        version: "21"
-        directory:  ${{ runner.temp }}/llvm-21
     - name: Install uv
       uses: astral-sh/setup-uv@v7
       with:
@@ -45,20 +56,32 @@ jobs:
     - name: Install dependencies
       run: |
         uv sync --all-extras --dev
-    - name: Lint with ruff
-      run: |
-        uv tool run ruff check --output-format=github
-    - name: Format with ruff
-      run: |
-        uv tool run ruff format --diff
+    - name: Set LLVM Path
+      run: echo "LLVM_PATH=$HOME/.llvm-21" >> $GITHUB_ENV
+    # 尝试从缓存恢复 LLVM
+    - name: Cache LLVM
+      id: cache-llvm
+      uses: actions/cache@v5
+      with:
+        path: ${{ env.LLVM_PATH }}
+        key: llvm-21-${{ runner.os }}
+    - name: Install LLVM and Clang
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "21"
+        directory: ${{ env.LLVM_PATH }}
+        cached: ${{ steps.cache-llvm.outputs.cache-hit }}
     - name: Test with pytest
       env:
-        LIBCLANG_PATH: ${{ runner.temp }}/llvm-21/lib
+        LIBCLANG_PATH: ${{ env.LLVM_PATH }}/lib
       run: |
         uv run pytest --cov --cov-report json
     - name: Update Coverage Badge
         # GitHub actions: default branch variable
         # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
-      if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      if: |
+        matrix.python-version == '3.14' &&
+        github.event_name == 'push' &&
+        github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
       uses: we-cli/coverage-badge-action@main
     
