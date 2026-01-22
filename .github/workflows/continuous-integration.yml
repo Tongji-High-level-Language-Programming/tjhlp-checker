@@ -43,8 +43,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
       - name: Install 32-bit library
         uses: tecolicom/actions-use-apt-tools@v1
         with:
