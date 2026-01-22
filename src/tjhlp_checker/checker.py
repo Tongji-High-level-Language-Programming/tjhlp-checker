@@ -1,6 +1,5 @@
 """
 同济高程代码合规检查
-由于 libclang 18.1.1 库的类型标注不够完善, 会出现无法识别枚举类型成员的错误，可以忽略或者手动修正
 """
 
 from enum import Enum
@@ -9,9 +8,9 @@ from pathlib import Path
 
 import clang.cindex as CX
 from clang.cindex import CursorKind as CK
+from clang.cindex import BinaryOperator as BO
 
 from .config import Config
-from .libclang_patch import BinaryOperator as BO
 from .libclang_patch import UnaryOperator as UO
 
 
@@ -62,6 +61,15 @@ class RuleViolation:
 
 
 def find_all_violations(file: Path, config: Config):
+    if not CX.Config.loaded:
+        libclang_path = os.environ.get("LIBCLANG_PATH")
+        if not libclang_path:
+            raise RuntimeError(
+                "Cannot find libclang installation."
+                " Please make sure LLVM is installed and env variable 'LIBCLANG_PATH' is set correctlly."
+            )
+        CX.Config.set_library_path(libclang_path)
+
     parse_options = CX.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD
     if file.name.endswith((".h", ".hpp")):
         parse_options |= CX.TranslationUnit.PARSE_INCOMPLETE

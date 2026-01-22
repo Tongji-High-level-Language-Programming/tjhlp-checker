@@ -30,6 +30,12 @@ jobs:
         method: timestamp
         cache: yes
         path: /usr/lib /usr/share /usr/include
+    - name: Install LLVM and Clang
+      id: install-llvm
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "21"
+        directory:  ${{ runner.temp }}/llvm-21
     - name: Install uv
       uses: astral-sh/setup-uv@v7
       with:
@@ -46,6 +52,8 @@ jobs:
       run: |
         uv tool run ruff format --diff
     - name: Test with pytest
+      env:
+        LIBCLANG_PATH: ${{ runner.temp }}/llvm-21/lib
       run: |
         uv run pytest --cov --cov-report json
     - name: Update Coverage Badge
