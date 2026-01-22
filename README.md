@@ -56,12 +56,3 @@ uv sync --all-extras --dev
 uvx pre-commit install
 uv build
 ```
-
-### 使用 Docker
-
-也可以直接使用 Docker:
-
-```bash
-docker build -t tjhlp-checker .
-docker run -it tjhlp-checker
-```
