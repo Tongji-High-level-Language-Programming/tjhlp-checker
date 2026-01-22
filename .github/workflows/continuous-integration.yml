@@ -5,31 +5,30 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 permissions:
-  # Coverage Badge Update requires write permission to the repository contents
-  contents: write
+  contents: read
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-    - name: Install uv
-      uses: astral-sh/setup-uv@v7
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
-        python-version: "3.14"
-    - name: Lint with ruff
-      run: |
-        uv tool run ruff check --output-format=github
-    - name: Format with ruff
-      run: |
-        uv tool run ruff format --diff
+      - uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          python-version: "3.14"
+      - name: Lint with ruff
+        run: |
+          uv tool run ruff check --output-format=github
+      - name: Format with ruff
+        run: |
+          uv tool run ruff format --diff
 
   unit-test:
     runs-on: ubuntu-latest
@@ -38,50 +37,54 @@ jobs:
       matrix:
         python-version: ["3.13", "3.14"]
 
+    permissions:
+      # Coverage Badge Update requires write permission to the repository contents
+      contents: write
+
     steps:
-    - uses: actions/checkout@v6
-    - name: Install 32-bit library
-      uses: tecolicom/actions-use-apt-tools@v1
-      with:
-        tools: g++-multilib
-        method: timestamp
-        cache: yes
-        path: /usr/lib /usr/share /usr/include
-    - name: Install uv
-      uses: astral-sh/setup-uv@v7
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        uv sync --all-extras --dev
-    - name: Set LLVM Path
-      run: echo "LLVM_PATH=$HOME/.llvm-21" >> $GITHUB_ENV
-    # 尝试从缓存恢复 LLVM
-    - name: Cache LLVM
-      id: cache-llvm
-      uses: actions/cache@v5
-      with:
-        path: ${{ env.LLVM_PATH }}
-        key: llvm-21-${{ runner.os }}
-    - name: Install LLVM and Clang
-      uses: KyleMayes/install-llvm-action@v2
-      with:
-        version: "21"
-        directory: ${{ env.LLVM_PATH }}
-        cached: ${{ steps.cache-llvm.outputs.cache-hit }}
-    - name: Test with pytest
-      env:
-        LIBCLANG_PATH: ${{ env.LLVM_PATH }}/lib
-      run: |
-        uv run pytest --cov --cov-report json
-    - name: Update Coverage Badge
-        # GitHub actions: default branch variable
-        # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
-      if: |
-        matrix.python-version == '3.14' &&
-        github.event_name == 'push' &&
-        github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-      uses: we-cli/coverage-badge-action@main
-    
+      - uses: actions/checkout@v6
+      - name: Install 32-bit library
+        uses: tecolicom/actions-use-apt-tools@v1
+        with:
+          tools: g++-multilib
+          method: timestamp
+          cache: yes
+          path: /usr/lib /usr/share /usr/include
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras --dev
+      - name: Set LLVM Path
+        run: echo "LLVM_PATH=$HOME/.llvm-21" >> $GITHUB_ENV
+      # 尝试从缓存恢复 LLVM
+      - name: Cache LLVM
+        id: cache-llvm
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.LLVM_PATH }}
+          key: llvm-21-${{ runner.os }}
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "21"
+          directory: ${{ env.LLVM_PATH }}
+          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
+      - name: Test with pytest
+        env:
+          LIBCLANG_PATH: ${{ env.LLVM_PATH }}/lib
+        run: |
+          uv run pytest --cov --cov-report json
+      - name:
+          Update Coverage Badge
+          # GitHub actions: default branch variable
+          # https://stackoverflow.com/questions/64781462/github-actions-default-branch-variable
+        if: |
+          matrix.python-version == '3.14' &&
+          github.event_name == 'push' &&
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: we-cli/coverage-badge-action@main
