@@ -268,7 +268,11 @@ def find_all_violations(file: Path, config: Config):
                 if config.grammar.disable_goto:
                     record_violation(ViolationKind.GOTO, node, context)
             case CK.WHILE_STMT | CK.FOR_STMT | CK.DO_STMT:
-                if config.grammar.disable_loop:
+                if (
+                    config.grammar.loop.disable
+                    and context.kind == CK.FUNCTION_DECL
+                    and context.spelling not in config.grammar.loop.function_whitelist
+                ):
                     record_violation(ViolationKind.LOOP, node, context)
             case CK.UNARY_OPERATOR:
                 # TODO: 检查形如 *(p+i) 的非法指针使用
